@@ -175,7 +175,7 @@ def build_graph(segments: list[list[tuple[float, float]]]):
                 for other in buckets.get((cx + dx, cy + dy), []):
                     if other <= key:
                         continue
-                    if distance_m(coord, nodes[other]) <= 18:
+                    if distance_m(coord, nodes[other]) <= 45:
                         add_edge(key, other)
                         add_edge(other, key)
                         unite(key, other)
@@ -308,6 +308,26 @@ def simplify(coords: list[tuple[float, float]], tolerance_m: float) -> list[tupl
     return [coord for coord, kept in zip(coords, keep) if kept]
 
 
+def remove_loops(coords: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Drop depot spurs that leave the running line and come back."""
+    changed = True
+    while changed and len(coords) > 3:
+        changed = False
+        for start in range(len(coords) - 2):
+            travelled = 0.0
+            for end in range(start + 2, len(coords)):
+                travelled += distance_m(coords[end - 1], coords[end])
+                if travelled > 1800:
+                    break
+                if travelled > 140 and distance_m(coords[start], coords[end]) < 55:
+                    coords = coords[: start + 1] + coords[end:]
+                    changed = True
+                    break
+            if changed:
+                break
+    return coords
+
+
 def round_coords(coords: list[tuple[float, float]]) -> list[list[float]]:
     rounded = []
     for lng, lat in coords:
@@ -333,7 +353,7 @@ def direct_slice(
         if start_index > end_index:
             piece = list(reversed(piece))
         curved = length_m(piece)
-        if curved > max(5000, straight * 1.9):
+        if curved > straight * 1.45 + 500:
             continue
         if best is None or curved < best[0]:
             best = (curved, piece)
@@ -371,7 +391,7 @@ def trace_path(
             if found is None:
                 # Long bridges leave the straight line between stations.
                 relaxed = shortest(nodes, edges, start_node, end_node)
-                if relaxed is not None and length_m(relaxed) <= max(6000, distance_m(start_point, end_point) * 1.75):
+                if relaxed is not None and length_m(relaxed) <= distance_m(start_point, end_point) * 1.45 + 800:
                     found = relaxed
         if found is None:
             raise SystemExit(f"no track between {left} and {right}")
@@ -380,11 +400,11 @@ def trace_path(
         curved = length_m(piece)
         if curved > max(4000, straight * 2.8):
             raise SystemExit(f"{left}-{right} track is {curved:.0f} m against a {straight:.0f} m straight line")
-        piece = simplify(piece, 18)
+        piece = simplify(piece, 4)
         if joined:
             piece = piece[1:]
         joined.extend(piece)
-    return round_coords(joined)
+    return round_coords(remove_loops(joined))
 
 
 def main() -> None:
