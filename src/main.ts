@@ -44,7 +44,7 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 const hongKong = boundsOf(mapData.stations)
 const map = new MlMap({
   container: "map",
-  style: "https://tiles.openfreemap.org/styles/liberty",
+  style: import.meta.env.DEV ? "/basemap/styles/liberty" : "https://tiles.openfreemap.org/styles/liberty",
   center: [114.15, 22.35],
   zoom: 10,
   attributionControl: false,
