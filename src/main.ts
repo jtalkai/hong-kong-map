@@ -62,20 +62,25 @@ map.addControl(
   "bottom-left",
 )
 
-map.on("load", () => {
+const hideBanner = () => {
   banner.hidden = true
+}
+
+map.on("load", () => {
+  hideBanner()
   addLayers()
   showHongKong(false)
   bindMapEvents()
   applyHash(true)
 })
+map.on("idle", hideBanner)
 
 window.setTimeout(() => {
-  if (!map.loaded()) {
+  if (!map.isStyleLoaded()) {
     banner.hidden = false
     banner.textContent = "底圖載入時間較長。請檢查網絡後再重新整理。"
   }
-}, 10_000)
+}, 15_000)
 
 buildLegend()
 bindChrome()
