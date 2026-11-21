@@ -1,6 +1,10 @@
-import { AttributionControl, Map as MlMap } from "maplibre-gl"
+import { AttributionControl, Map as MlMap, setWorkerUrl } from "maplibre-gl"
 import type { FilterSpecification, GeoJSONSource, MapMouseEvent } from "maplibre-gl"
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url"
 import "maplibre-gl/dist/maplibre-gl.css"
+
+// Vite cannot follow MapLibre's dynamic sibling worker URL, so point at the real file.
+setWorkerUrl(maplibreWorkerUrl)
 import cameras from "./data/cameras.json" with { type: "json" }
 import network from "./data/network.json" with { type: "json" }
 import { fetchSchedule, loadSnapshot } from "./live.ts"
@@ -40,7 +44,7 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 const hongKong = boundsOf(mapData.stations)
 const map = new MlMap({
   container: "map",
-  style: "https://tiles.openfreemap.org/styles/liberty",
+  style: import.meta.env.DEV ? "/basemap/styles/liberty" : "https://tiles.openfreemap.org/styles/liberty",
   center: [114.15, 22.35],
   zoom: 10,
   attributionControl: false,
