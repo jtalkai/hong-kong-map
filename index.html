@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="香港智慧城市地圖：以 OpenFreeMap 為底圖，查看港鐵到站班次和運輸署交通快拍。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>香港智慧城市地圖</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="map" role="application" aria-label="香港地圖"></div>
+      <header class="topbar">
+        <div class="brand">
+          <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect width="32" height="32" rx="8" fill="#173027" />
+            <circle cx="16" cy="15" r="6.5" fill="none" stroke="#f4efe4" stroke-width="2" />
+            <path d="M7 22h18" stroke="#e08a2c" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <div>
+            <p class="kicker">Hong Kong</p>
+            <h1>智慧城市地圖</h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <div class="toggles" role="group" aria-label="地圖圖層">
+            <button type="button" id="toggle-mtr" aria-pressed="true">
+              港鐵 <span id="mtr-count"></span>
+            </button>
+            <button type="button" id="toggle-cameras" aria-pressed="true">
+              交通快拍 <span id="camera-count"></span>
+            </button>
+          </div>
+          <div class="zoom" role="group" aria-label="地圖縮放">
+            <button type="button" id="zoom-in" aria-label="放大">+</button>
+            <button type="button" id="zoom-out" aria-label="縮小">−</button>
+            <button type="button" id="zoom-home">全港</button>
+          </div>
+        </div>
+      </header>
+      <aside id="legend" class="legend" aria-label="港鐵路綫">
+        <p class="legend-note">十條路綫有實時班次。深色圓點是轉車站。</p>
+        <div id="legend-list" class="legend-list"></div>
+      </aside>
+      <p id="map-banner" class="map-banner" hidden></p>
+      <aside id="panel" class="panel is-idle" aria-live="polite" aria-label="所選地點"></aside>
+    </div>
+    <noscript>請啟用 JavaScript，地圖、到站班次和交通快拍才能顯示。</noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
