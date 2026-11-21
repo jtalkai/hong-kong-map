@@ -57,7 +57,7 @@ map.addControl(
   new AttributionControl({
     compact: true,
     customAttribution:
-      '班次及快拍來自 <a href="https://data.gov.hk/" target="_blank" rel="noopener noreferrer">DATA.GOV.HK</a>',
+      '班次及快拍來自 <a href="https://data.gov.hk/" target="_blank" rel="noopener noreferrer">DATA.GOV.HK</a>，路軌來自 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>',
   }),
   "bottom-left",
 )
@@ -87,16 +87,18 @@ function addLayers(): void {
     data: {
       type: "FeatureCollection",
       features: mapData.lines.flatMap((line) =>
-        line.paths.map((path) => ({
+        line.paths.map((path, index) => ({
           type: "Feature" as const,
-          properties: { lineId: line.id, color: line.color, offset: line.offset },
+          properties: { lineId: line.id, color: line.color, offset: line.tracks ? 0 : line.offset },
           geometry: {
             type: "LineString" as const,
-            coordinates: path.map((code) => {
-              const station = stationByCode.get(code)
-              if (!station) throw new Error(`缺少車站座標 ${code}`)
-              return [station.lng, station.lat] as [number, number]
-            }),
+            coordinates:
+              line.tracks?.[index] ??
+              path.map((code) => {
+                const station = stationByCode.get(code)
+                if (!station) throw new Error(`缺少車站座標 ${code}`)
+                return [station.lng, station.lat] as [number, number]
+              }),
           },
         })),
       ),

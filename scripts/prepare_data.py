@@ -23,6 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CACHE_PATH = ROOT / "scripts" / "geocode-cache.json"
+TRACK_PATH = ROOT / "scripts" / "track-cache.json"
 NETWORK_PATH = ROOT / "src" / "data" / "network.json"
 CAMERAS_PATH = ROOT / "src" / "data" / "cameras.json"
 CAMERA_XML = "https://static.data.gov.hk/td/traffic-snapshot-images/code/Traffic_Camera_Locations_Tc.xml"
@@ -159,7 +160,16 @@ def build_network(cache: dict) -> dict:
                 if km > 25:
                     raise SystemExit(f"{line['id']} {left}-{right} is {km:.1f} km, check the coordinates")
     stations.sort(key=lambda item: item["code"])
-    return {"lines": LINES, "stations": stations}
+    lines = [dict(line) for line in LINES]
+    if TRACK_PATH.exists():
+        tracks = json.loads(TRACK_PATH.read_text(encoding="utf-8"))
+        for line in lines:
+            geometry = tracks.get(line["id"])
+            if geometry is not None and len(geometry) != len(line["paths"]):
+                raise SystemExit(f"{line['id']} track count does not match its paths")
+            if geometry is not None:
+                line["tracks"] = geometry
+    return {"lines": lines, "stations": stations}
 
 
 def build_cameras() -> list[dict]:

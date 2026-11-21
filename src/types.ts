@@ -5,6 +5,7 @@ export interface LineRecord {
   color: string
   offset: number
   paths: string[][]
+  tracks?: [number, number][][]
 }
 
 export interface StationRecord {
